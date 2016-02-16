@@ -1,5 +1,7 @@
 uses the font tag as a placeholder
-<font is="lang-i18n">key_to_my_string</font>
+<code>
+	&lt;font is="lang-i18n"&gt;key_to_my_string&lt;/font&gt;
+</code>
 
 TODO unittest
 TODO params in string
