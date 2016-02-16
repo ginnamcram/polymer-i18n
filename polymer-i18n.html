@@ -1,0 +1,52 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<dom-module id="lang-i18n">
+  <template>
+	<content></content>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer.i18n = {
+      	_current 	: {},
+      	baseUrl 	: 'i18n',
+      	set: function(lang){
+      		//loads a locale
+      		$http({
+      			method: 'get',
+      			url: this.baseUrl + '/' + lang + '.json'
+      		})
+      		.then(function(rsp){
+      			Polymer.i18n._current = rsp;
+      			var elements = document.getElementsByTagName('font');
+      			var el;
+      			for (var i = 0; i < elements.length; i++) {
+      				el = elements[i];
+      				if(el.attributes.is && el.attributes.is.nodeValue == 'lang-i18n')
+      					el.refresh();
+      			};
+      		})
+      		.catch(function(){
+      			Polymer.i18n._current = {};
+      			console.log('failed to load locale ' + lang);
+      		})
+      	}
+      };
+
+      Polymer({
+        is 		: 'lang-i18n',
+        extends 	: 'font',
+        ready: function() {
+          //save original key
+          this._key = this.textContent.trim();
+          this.refresh();
+        },
+        refresh: function(){
+        	var text = Polymer.i18n._current[this._key];
+        	this.textContent = text?text:('[' + this._key + ']');
+        }
+      });
+    })();
+  </script>
+</dom-module>
