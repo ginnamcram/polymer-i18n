@@ -1,0 +1,12 @@
+{
+  "name": "polymer-i18n",
+  "private": true,
+  "version": "1.0",
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.0.0"
+  },
+  "devDependencies": {
+  	"microhttp": "ginnamcram/microhttp",
+    "web-component-tester": "Polymer/web-component-tester#^1.0.0"
+  }
+}
