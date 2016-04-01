@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>empty-list tests</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <script src="../../webcomponentsjs/webcomponents.js"></script>
+  <script src="../../web-component-tester/browser.js"></script>
+  <link href="../polymer-i18n.html" rel="import">
+</head>
+<body>
+	<font is="lang-i18n" id="test1">test_none</font>
+  <font is="lang-i18n" id="test2">test_simple</font>
+  <font is="lang-i18n" id="test3" param="with parameters">test_parameters</font>
+  <font is="lang-i18n" id="test4" param="with parameters">test_parameters_fail</font>
+  <script>
+  (function(){
+    'use strict';
+    
+    test('load/set text', function() {
+      Polymer.i18n.register(
+      'en',{
+        'test_simple':'a simple test',
+        'test_parameters':'a simple test {param}',
+        'test_parameters_fail':'a simple test {param2}'
+      });
+      Polymer.i18n.set('en');
+
+      assert.equal('a simple test',Polymer.i18n._current['test_simple']);
+    });
+    test('undefined text', function() {
+      var el = document.getElementById('test1');
+      assert.equal('[test_none]',el.innerHTML);
+    });
+    test('normal text label', function() {
+      var el = document.getElementById('test2');
+      assert.equal('a simple test',el.innerHTML);
+    });
+    test('text label with parameters', function() {
+      var el = document.getElementById('test3');
+      assert.equal('a simple test with parameters',el.innerHTML);
+    });
+     test('text label with missing parameters', function() {
+      var el = document.getElementById('test4');
+      assert.equal('a simple test undefined',el.innerHTML);
+    });
+
+  })();
+  </script>
+</body>
+</html>

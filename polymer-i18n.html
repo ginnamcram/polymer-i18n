@@ -1,4 +1,5 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../promise-polyfill/promise-polyfill.html">
 <dom-module id="lang-i18n">
   <template>
 	<content></content>
@@ -10,28 +11,40 @@
 
       Polymer.i18n = {
       	_current 	: {},
+        _def      : {},
       	baseUrl 	: 'i18n',
       	set: function(lang){
       		//loads a locale
-      		$http({
-      			method: 'get',
-      			url: this.baseUrl + '/' + lang + '.json'
-      		})
-      		.then(function(rsp){
-      			Polymer.i18n._current = rsp;
-      			var elements = document.getElementsByTagName('font');
-      			var el;
-      			for (var i = 0; i < elements.length; i++) {
-      				el = elements[i];
-      				if(el.attributes.is && el.attributes.is.nodeValue == 'lang-i18n')
-      					el.refresh();
-      			};
-      		})
-      		.catch(function(){
-      			Polymer.i18n._current = {};
-      			console.log('failed to load locale ' + lang);
-      		})
-      	}
+          if(this._def[lang]){
+            this._current = this._def[lang];
+            Polymer.i18n.refresh();
+          }else{
+            $http({
+              method: 'get',
+              url: this.baseUrl + '/' + lang + '.json'
+            })
+            .then(function(rsp){
+              Polymer.i18n._current = rsp;
+              Polymer.i18n.refresh();
+            })
+            .catch(function(){
+              Polymer.i18n._current = {};
+              console.log('failed to load locale ' + lang);
+            });
+          }
+      	},
+        register:function(lang,defs){
+          Polymer.i18n._def[lang] = defs;
+        },
+        refresh:function(){
+          var elements = document.getElementsByTagName('font');
+          var el;
+          for (var i = 0; i < elements.length; i++) {
+            el = elements[i];
+            if(el.attributes.is && el.attributes.is.nodeValue == 'lang-i18n')
+              el.refresh();
+          };
+        }
       };
 
       Polymer({
@@ -44,6 +57,14 @@
         },
         refresh: function(){
         	var text = Polymer.i18n._current[this._key];
+          //detect parameters
+          if(text){
+            var el = this;
+            text = text.replace(/\{\w+}/g,function(param){
+              var attr = el.attributes[param.substr(1, param.length-2)];
+              return attr?attr.value:'undefined';
+            });
+          }
         	this.textContent = text?text:('[' + this._key + ']');
         }
       });
